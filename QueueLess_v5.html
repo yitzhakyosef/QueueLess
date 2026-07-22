@@ -481,6 +481,16 @@
       font-weight: 800;
     }
 
+    .message ul {
+      margin: 8px 0;
+      padding-inline-start: 22px;
+      line-height: 1.7;
+    }
+
+    .block-warning {
+      border: 1px solid rgba(180,83,9,0.22);
+    }
+
     .field-error {
       min-height: 18px;
       margin: 0;
@@ -1129,6 +1139,8 @@
     let customerAuthMode = "login";
     let currentUser = null;
     let pendingOtpUser = null;
+    let pendingOtpMode = "login";
+    let pendingRegistrationData = null;
     let selectedServiceId = "";
     let selectedDate = getDateOffset(1);
     let selectedTime = "";
@@ -1137,10 +1149,18 @@
     let ownerFilter = "pending";
     let ownerCustomerQuery = "";
     let ownerSelectedCustomerId = "";
+    let ownerBlockMode = "full-day";
     let ownerBlockedStartDate = getDateOffset(1);
     let ownerBlockedEndDate = getDateOffset(1);
+    let ownerBlockedHourDate = getDateOffset(1);
+    let ownerBlockedStartTime = "";
+    let ownerBlockedEndTime = "";
     let blockedStartDateError = "";
     let blockedEndDateError = "";
+    let blockedHourDateError = "";
+    let blockedStartTimeError = "";
+    let blockedEndTimeError = "";
+    let pendingBlockRequest = null;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1223,12 +1243,28 @@
       return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
     }
 
-    function createBlockedRange(startDate, endDate, id = "") {
+    function isTimeKey(value) {
+      return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || ""));
+    }
+
+    function createBlockedRange(startDate, endDate, id = "", createdAt = "") {
       return {
         id: id || crypto.randomUUID(),
+        type: "full-day",
         start_date: startDate,
         end_date: endDate,
-        created_at: new Date().toISOString()
+        created_at: createdAt || new Date().toISOString()
+      };
+    }
+
+    function createBlockedHours(date, startTime, endTime, id = "", createdAt = "") {
+      return {
+        id: id || crypto.randomUUID(),
+        type: "hours",
+        date,
+        start_time: startTime,
+        end_time: endTime,
+        created_at: createdAt || new Date().toISOString()
       };
     }
 
@@ -1240,18 +1276,24 @@
             return createBlockedRange(item, item, `legacy-${item}`);
           }
           if (!item || typeof item !== "object") return null;
+          if (item.type === "hours") {
+            const date = item.date || item.blocked_date || item.start_date;
+            const startTime = item.start_time || item.startTime;
+            const endTime = item.end_time || item.endTime;
+            if (!isDateKey(date) || !isTimeKey(startTime) || !isTimeKey(endTime) || endTime < startTime) return null;
+            return createBlockedHours(date, startTime, endTime, item.id || `hours-${date}-${startTime}-${endTime}-${index}`, item.created_at || item.createdAt || "");
+          }
           const startDate = item.start_date || item.startDate || item.date;
           const endDate = item.end_date || item.endDate || startDate;
           if (!isDateKey(startDate) || !isDateKey(endDate) || endDate < startDate) return null;
-          return {
-            id: item.id || `range-${startDate}-${endDate}-${index}`,
-            start_date: startDate,
-            end_date: endDate,
-            created_at: item.created_at || item.createdAt || ""
-          };
+          return createBlockedRange(startDate, endDate, item.id || `range-${startDate}-${endDate}-${index}`, item.created_at || item.createdAt || "");
         })
         .filter(Boolean)
-        .sort((first, second) => first.start_date.localeCompare(second.start_date) || first.end_date.localeCompare(second.end_date));
+        .sort((first, second) => {
+          const firstDate = first.type === "hours" ? first.date : first.start_date;
+          const secondDate = second.type === "hours" ? second.date : second.start_date;
+          return firstDate.localeCompare(secondDate) || String(first.start_time || "").localeCompare(String(second.start_time || ""));
+        });
     }
 
     function loadBlockedDates() {
@@ -1265,10 +1307,18 @@
     function saveBlockedDates(blockedRanges) {
       const uniqueRanges = [];
       normalizeBlockedRanges(blockedRanges).forEach(range => {
-        const exists = uniqueRanges.some(item => item.start_date === range.start_date && item.end_date === range.end_date);
+        const exists = uniqueRanges.some(item => isSameBlockedRange(item, range));
         if (!exists) uniqueRanges.push(range);
       });
       localStorage.setItem(storageKeys.blockedDates, JSON.stringify(uniqueRanges));
+    }
+
+    function isSameBlockedRange(first, second) {
+      if (first.type !== second.type) return false;
+      if (first.type === "hours") {
+        return first.date === second.date && first.start_time === second.start_time && first.end_time === second.end_time;
+      }
+      return first.start_date === second.start_date && first.end_date === second.end_date;
     }
 
     function normalizeHebrewName(name) {
@@ -1331,11 +1381,24 @@
     }
 
     function blockedRangeIncludesDate(range, date) {
+      if (range.type === "hours") return isDateKey(date) && range.date === date;
       return isDateKey(date) && date >= range.start_date && date <= range.end_date;
     }
 
     function isDateBlocked(date) {
-      return loadBlockedDates().some(range => blockedRangeIncludesDate(range, date));
+      return loadBlockedDates().some(range => range.type !== "hours" && blockedRangeIncludesDate(range, date));
+    }
+
+    function isTimeBlocked(date, time) {
+      if (!date || !time) return false;
+      return loadBlockedDates().some(range => {
+        if (range.type !== "hours") return blockedRangeIncludesDate(range, date);
+        return range.date === date && time >= range.start_time && time <= range.end_time;
+      });
+    }
+
+    function isSlotUnavailable(date, time) {
+      return isSlotTaken(date, time) || isTimeBlocked(date, time);
     }
 
     function seedDemoData() {
@@ -1354,15 +1417,25 @@
       currentRole = "customer";
       customerAuthMode = "login";
       pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       selectedServiceId = "";
       selectedTime = "";
       customerPhone = "";
       ownerCustomerQuery = "";
       ownerSelectedCustomerId = "";
+      ownerBlockMode = "full-day";
       ownerBlockedStartDate = getDateOffset(1);
       ownerBlockedEndDate = getDateOffset(1);
+      ownerBlockedHourDate = getDateOffset(1);
+      ownerBlockedStartTime = "";
+      ownerBlockedEndTime = "";
       blockedStartDateError = "";
       blockedEndDateError = "";
+      blockedHourDateError = "";
+      blockedStartTimeError = "";
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
       seedDemoData();
       showToast("נתוני המערכת אופסו בהצלחה");
       render();
@@ -1398,8 +1471,14 @@
       currentRole = "customer";
       customerAuthMode = "login";
       pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       blockedStartDateError = "";
       blockedEndDateError = "";
+      blockedHourDateError = "";
+      blockedStartTimeError = "";
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
       localStorage.removeItem(storageKeys.session);
       render();
     }
@@ -1415,6 +1494,8 @@
       currentUser = { type: "customer", ...customer };
       customerPhone = customer.phone || "";
       pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       setSession({ type: "customer", customerId: customer.id });
       currentScreen = "home";
       showToast(`שלום ${customerDisplayName(customer)}, ברוך הבא למספרת רמת גן`);
@@ -1458,8 +1539,15 @@
       }
       if (!valid) return;
 
-      const customer = createCustomerUser({ fullName, phone, nationalId, email, password });
-      completeCustomerLogin(customer);
+      pendingRegistrationData = { fullName, phone, nationalId, email, password };
+      pendingOtpUser = {
+        id: phone,
+        full_name: fullName,
+        phone
+      };
+      pendingOtpMode = "register";
+      currentScreen = "otp";
+      render();
     }
 
     function loginCustomer() {
@@ -1486,6 +1574,8 @@
       }
 
       pendingOtpUser = customer;
+      pendingRegistrationData = null;
+      pendingOtpMode = "login";
       currentScreen = "otp";
       render();
     }
@@ -1500,13 +1590,34 @@
         setOtpMessage("קוד האימות שגוי. נסה שוב");
         return;
       }
+      if (pendingOtpMode === "register") {
+        const registration = pendingRegistrationData;
+        if (!registration) {
+          backToCustomerLogin();
+          return;
+        }
+        if (findUserByPhone(registration.phone)) {
+          setOtpMessage("מספר הנייד הזה כבר רשום במערכת. יש לעבור להתחברות");
+          return;
+        }
+        if (findUserByNationalId(registration.nationalId)) {
+          setOtpMessage("תעודת הזהות הזו רשומה על לקוח אחר");
+          return;
+        }
+        const customer = createCustomerUser(registration);
+        completeCustomerLogin(customer);
+        return;
+      }
       completeCustomerLogin(pendingOtpUser);
     }
 
     function backToCustomerLogin() {
+      const previousOtpMode = pendingOtpMode;
       pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       currentScreen = "login";
-      customerAuthMode = "login";
+      customerAuthMode = previousOtpMode === "register" ? "register" : "login";
       render();
     }
 
@@ -1522,8 +1633,13 @@
       ownerFilter = "pending";
       ownerCustomerQuery = "";
       ownerSelectedCustomerId = "";
+      ownerBlockMode = "full-day";
       blockedStartDateError = "";
       blockedEndDateError = "";
+      blockedHourDateError = "";
+      blockedStartTimeError = "";
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
       showToast("נכנסת לדשבורד בעל העסק");
       render();
     }
@@ -1569,12 +1685,18 @@
     function setCustomerAuthMode(mode) {
       customerAuthMode = mode;
       currentScreen = "login";
+      pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       render();
     }
 
     function setRole(role) {
       currentRole = role;
       currentScreen = "login";
+      pendingOtpUser = null;
+      pendingOtpMode = "login";
+      pendingRegistrationData = null;
       render();
     }
 
@@ -1590,13 +1712,19 @@
     }
 
     function selectTime(time) {
+      if (isTimeBlocked(selectedDate, time) || isSlotTaken(selectedDate, time)) {
+        selectedTime = "";
+        showToast("השעה הזו אינה זמינה");
+        render();
+        return;
+      }
       selectedTime = time;
       render();
     }
 
     function setDate(value) {
       selectedDate = value;
-      if (isDateBlocked(selectedDate) || isSlotTaken(selectedDate, selectedTime)) selectedTime = "";
+      if (isDateBlocked(selectedDate) || isSlotUnavailable(selectedDate, selectedTime)) selectedTime = "";
       render();
     }
 
@@ -1721,6 +1849,12 @@
         showToast("יש לבחור שעה פנויה לתור");
         return;
       }
+      if (isTimeBlocked(selectedDate, selectedTime)) {
+        selectedTime = "";
+        showToast("השעה הזו חסומה על ידי בעל המספרה");
+        render();
+        return;
+      }
       if (!phoneInput || !phoneInput.checkValidity() || cleanPhone.length < 9 || cleanPhone.length > 10 || !cleanPhone.startsWith("0")) {
         phoneInput?.reportValidity();
         showToast("יש להזין מספר נייד תקין");
@@ -1789,24 +1923,141 @@
     }
 
     function formatBlockedRange(range) {
+      if (range.type === "hours") {
+        return `${formatDateShort(range.date)} בין ${range.start_time} ל-${range.end_time}`;
+      }
       const start = formatDateShort(range.start_date);
       const end = formatDateShort(range.end_date);
-      return range.start_date === range.end_date ? start : `מ-${start} עד ${end}`;
+      return range.start_date === range.end_date ? `${start} - יום שלם` : `מ-${start} עד ${end} - ימים שלמים`;
+    }
+
+    function clearBlockedErrors() {
+      blockedStartDateError = "";
+      blockedEndDateError = "";
+      blockedHourDateError = "";
+      blockedStartTimeError = "";
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
+    }
+
+    function setOwnerBlockMode(mode) {
+      ownerBlockMode = mode;
+      clearBlockedErrors();
+      render();
     }
 
     function setOwnerBlockedStartDate(value) {
       ownerBlockedStartDate = value;
       blockedStartDateError = "";
+      pendingBlockRequest = null;
+      render();
     }
 
     function setOwnerBlockedEndDate(value) {
       ownerBlockedEndDate = value;
       blockedEndDateError = "";
+      pendingBlockRequest = null;
+      render();
+    }
+
+    function setOwnerBlockedHourDate(value) {
+      ownerBlockedHourDate = value;
+      blockedHourDateError = "";
+      pendingBlockRequest = null;
+      render();
+    }
+
+    function setOwnerBlockedStartTime(value) {
+      ownerBlockedStartTime = value;
+      blockedStartTimeError = "";
+      pendingBlockRequest = null;
+      render();
+    }
+
+    function setOwnerBlockedEndTime(value) {
+      ownerBlockedEndTime = value;
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
+      render();
+    }
+
+    function appointmentConflictsWithBlock(appointment, block) {
+      if (!["pending", "confirmed"].includes(appointment.status)) return false;
+      if (block.type === "hours") {
+        return appointment.appointment_date === block.date &&
+          appointment.appointment_time >= block.start_time &&
+          appointment.appointment_time <= block.end_time;
+      }
+      return appointment.appointment_date >= block.start_date && appointment.appointment_date <= block.end_date;
+    }
+
+    function conflictingAppointmentsForBlock(block) {
+      return sortAppointments(loadAppointments().filter(appointment => appointmentConflictsWithBlock(appointment, block)));
+    }
+
+    function cancelConflictingAppointments(block) {
+      const appointments = loadAppointments();
+      let cancelledCount = 0;
+      const now = new Date().toISOString();
+      appointments.forEach(appointment => {
+        if (appointmentConflictsWithBlock(appointment, block)) {
+          // במערכת אמיתית ביטול יזום כזה היה שולח גם התראה ללקוח. בדמו העדכון מגיע מיד דרך localStorage ואירוע storage בדפדפן.
+          appointment.status = "cancelled";
+          appointment.updated_at = now;
+          cancelledCount++;
+        }
+      });
+      if (cancelledCount) saveAppointments(appointments);
+      return cancelledCount;
+    }
+
+    function saveBlockAndCancelConflicts(block, successMessage) {
+      const blockedRanges = loadBlockedDates();
+      blockedRanges.push(block);
+      saveBlockedDates(blockedRanges);
+      const cancelledCount = cancelConflictingAppointments(block);
+      pendingBlockRequest = null;
+      if (isDateBlocked(selectedDate) || isTimeBlocked(selectedDate, selectedTime)) selectedTime = "";
+      showToast(cancelledCount ? `${successMessage}. ${cancelledCount} תורים מתנגשים בוטלו` : successMessage);
+      render();
+    }
+
+    function requestBlockWithConflictCheck(block, existsMessage, successMessage) {
+      const blockedRanges = loadBlockedDates();
+      const exists = blockedRanges.some(range => isSameBlockedRange(range, block));
+      if (exists) {
+        if (block.type === "hours") blockedEndTimeError = existsMessage;
+        else blockedEndDateError = existsMessage;
+        pendingBlockRequest = null;
+        render();
+        return;
+      }
+
+      const conflicts = conflictingAppointmentsForBlock(block);
+      if (conflicts.length) {
+        pendingBlockRequest = { block, conflicts, successMessage };
+        render();
+        return;
+      }
+
+      saveBlockAndCancelConflicts(block, successMessage);
+    }
+
+    function confirmPendingBlock() {
+      if (!pendingBlockRequest) return;
+      saveBlockAndCancelConflicts(pendingBlockRequest.block, pendingBlockRequest.successMessage);
+    }
+
+    function cancelPendingBlock() {
+      pendingBlockRequest = null;
+      showToast("החסימה בוטלה ולא בוצע שינוי בתורים");
+      render();
     }
 
     function blockDateRange() {
       blockedStartDateError = "";
       blockedEndDateError = "";
+      pendingBlockRequest = null;
       if (!ownerBlockedStartDate) {
         blockedStartDateError = "יש לבחור תאריך התחלה";
       }
@@ -1821,24 +2072,46 @@
         return;
       }
 
-      const blockedRanges = loadBlockedDates();
-      const exists = blockedRanges.some(range => range.start_date === ownerBlockedStartDate && range.end_date === ownerBlockedEndDate);
-      if (exists) {
-        blockedEndDateError = "הטווח הזה כבר חסום";
+      requestBlockWithConflictCheck(
+        createBlockedRange(ownerBlockedStartDate, ownerBlockedEndDate),
+        "הטווח הזה כבר חסום",
+        "טווח התאריכים נחסם בהצלחה"
+      );
+    }
+
+    function blockHoursRange() {
+      blockedHourDateError = "";
+      blockedStartTimeError = "";
+      blockedEndTimeError = "";
+      pendingBlockRequest = null;
+
+      if (!ownerBlockedHourDate) {
+        blockedHourDateError = "יש לבחור תאריך";
+      }
+      if (!ownerBlockedStartTime) {
+        blockedStartTimeError = "יש לבחור שעת התחלה";
+      }
+      if (!ownerBlockedEndTime) {
+        blockedEndTimeError = "יש לבחור שעת סיום";
+      }
+      if (ownerBlockedStartTime && ownerBlockedEndTime && ownerBlockedEndTime < ownerBlockedStartTime) {
+        blockedEndTimeError = "שעת הסיום חייבת להיות אחרי שעת ההתחלה";
+      }
+      if (blockedHourDateError || blockedStartTimeError || blockedEndTimeError) {
         render();
         return;
       }
 
-      blockedRanges.push(createBlockedRange(ownerBlockedStartDate, ownerBlockedEndDate));
-      saveBlockedDates(blockedRanges);
-      if (isDateBlocked(selectedDate)) selectedTime = "";
-      showToast("טווח התאריכים נחסם בהצלחה");
-      render();
+      requestBlockWithConflictCheck(
+        createBlockedHours(ownerBlockedHourDate, ownerBlockedStartTime, ownerBlockedEndTime),
+        "טווח השעות הזה כבר חסום",
+        "טווח השעות נחסם בהצלחה"
+      );
     }
 
     function unblockBlockedRange(id) {
       saveBlockedDates(loadBlockedDates().filter(range => range.id !== id));
-      showToast("חסימת הטווח הוסרה");
+      showToast("החסימה הוסרה");
       render();
     }
 
@@ -1850,12 +2123,14 @@
 
     function renderBlockedDatesPanel() {
       const blockedRanges = loadBlockedDates();
+      const timeOptions = slots.map(time => `<option value="${time}" ${time === ownerBlockedStartTime ? "selected" : ""}>${time}</option>`).join("");
+      const endTimeOptions = slots.map(time => `<option value="${time}" ${time === ownerBlockedEndTime ? "selected" : ""}>${time}</option>`).join("");
       const list = blockedRanges.length ? blockedRanges.map(range => `
         <article class="appointment-card">
           <div class="appointment-top">
             <div>
               <h3>${formatBlockedRange(range)}</h3>
-              <p class="hint">המספרה סגורה בכל התאריכים בטווח זה ולא ניתן לקבוע בהם תורים.</p>
+              <p class="hint">${range.type === "hours" ? "רק השעות שבטווח זה חסומות ללקוחות. שאר היום נשאר זמין." : "המספרה סגורה בכל התאריכים בטווח זה ולא ניתן לקבוע בהם תורים."}</p>
             </div>
             <button class="danger-btn" onclick="unblockBlockedRange('${escapeHtml(range.id)}')">הסר חסימה</button>
           </div>
@@ -1873,25 +2148,75 @@
         <section class="card panel mt">
           <div class="section-head" style="margin-top:0">
             <div>
-              <h2>חסימת תאריכים</h2>
-              <p>בחר טווח שבו המספרה סגורה. יום בודד נחסם על ידי בחירת אותו תאריך בשני השדות.</p>
+              <h2>חסימת תאריכים ושעות</h2>
+              <p>אפשר לחסום יום שלם או רק שעות מסוימות בתוך יום, בלי להסתיר שעות פנויות שלא נפגעו.</p>
             </div>
           </div>
-          <div class="grid two">
-            <div class="field">
-              <label for="ownerBlockedStartDate">מתאריך</label>
-              <input id="ownerBlockedStartDate" type="date" min="${getDateOffset(0)}" value="${ownerBlockedStartDate}" onchange="setOwnerBlockedStartDate(this.value)" />
-              <p class="field-error" aria-live="polite">${escapeHtml(blockedStartDateError)}</p>
-            </div>
-            <div class="field">
-              <label for="ownerBlockedEndDate">עד תאריך</label>
-              <input id="ownerBlockedEndDate" type="date" min="${getDateOffset(0)}" value="${ownerBlockedEndDate}" onchange="setOwnerBlockedEndDate(this.value)" />
-              <p class="field-error" aria-live="polite">${escapeHtml(blockedEndDateError)}</p>
-            </div>
+          <div class="tabs" style="margin-top:0">
+            <button class="tab ${ownerBlockMode === "full-day" ? "active" : ""}" onclick="setOwnerBlockMode('full-day')">יום או טווח מלא</button>
+            <button class="tab ${ownerBlockMode === "hours" ? "active" : ""}" onclick="setOwnerBlockMode('hours')">שעות ביום</button>
           </div>
-          <button class="primary-btn" onclick="blockDateRange()">חסום טווח</button>
+          ${ownerBlockMode === "full-day" ? `
+            <div class="grid two">
+              <div class="field">
+                <label for="ownerBlockedStartDate">מתאריך</label>
+                <input id="ownerBlockedStartDate" type="date" min="${getDateOffset(0)}" value="${ownerBlockedStartDate}" onchange="setOwnerBlockedStartDate(this.value)" />
+                <p class="field-error" aria-live="polite">${escapeHtml(blockedStartDateError)}</p>
+              </div>
+              <div class="field">
+                <label for="ownerBlockedEndDate">עד תאריך</label>
+                <input id="ownerBlockedEndDate" type="date" min="${getDateOffset(0)}" value="${ownerBlockedEndDate}" onchange="setOwnerBlockedEndDate(this.value)" />
+                <p class="field-error" aria-live="polite">${escapeHtml(blockedEndDateError)}</p>
+              </div>
+            </div>
+            <button class="primary-btn" onclick="blockDateRange()">חסום יום או טווח</button>
+          ` : `
+            <div class="grid three">
+              <div class="field">
+                <label for="ownerBlockedHourDate">תאריך</label>
+                <input id="ownerBlockedHourDate" type="date" min="${getDateOffset(0)}" value="${ownerBlockedHourDate}" onchange="setOwnerBlockedHourDate(this.value)" />
+                <p class="field-error" aria-live="polite">${escapeHtml(blockedHourDateError)}</p>
+              </div>
+              <div class="field">
+                <label for="ownerBlockedStartTime">משעה</label>
+                <select id="ownerBlockedStartTime" onchange="setOwnerBlockedStartTime(this.value)">
+                  <option value="">בחר שעה</option>
+                  ${timeOptions}
+                </select>
+                <p class="field-error" aria-live="polite">${escapeHtml(blockedStartTimeError)}</p>
+              </div>
+              <div class="field">
+                <label for="ownerBlockedEndTime">עד שעה</label>
+                <select id="ownerBlockedEndTime" onchange="setOwnerBlockedEndTime(this.value)">
+                  <option value="">בחר שעה</option>
+                  ${endTimeOptions}
+                </select>
+                <p class="field-error" aria-live="polite">${escapeHtml(blockedEndTimeError)}</p>
+              </div>
+            </div>
+            <button class="primary-btn" onclick="blockHoursRange()">חסום שעות</button>
+          `}
+          ${renderBlockConflictWarning()}
           <div class="grid mt">${list}</div>
         </section>
+      `;
+    }
+
+    function renderBlockConflictWarning() {
+      if (!pendingBlockRequest) return "";
+      const items = pendingBlockRequest.conflicts.map(appointment => `
+        <li>${escapeHtml(appointment.customer_name)} - ${formatDateShort(appointment.appointment_date)} בשעה ${appointment.appointment_time}</li>
+      `).join("");
+      return `
+        <div class="message block-warning" role="alert">
+          <strong>שים לב, בטווח שבחרת קיימים התורים הבאים:</strong>
+          <ul>${items}</ul>
+          <p>אם תמשיך, התורים האלה יבוטלו והזמן שבחרת יישאר חסום ללקוחות.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            <button class="danger-btn" onclick="confirmPendingBlock()">המשך וחסום</button>
+            <button class="ghost-btn" onclick="cancelPendingBlock()">ביטול</button>
+          </div>
+        </div>
       `;
     }
 
@@ -1977,7 +2302,7 @@
             <p id="registerPasswordError" class="field-error" aria-live="polite"></p>
           </div>
           <button class="primary-btn" style="width:100%" type="submit">הרשמה</button>
-          <p class="hint">הרשמה מוצלחת יוצרת משתמש ומחברת אותך אוטומטית.</p>
+          <p class="hint">הרשמה תקינה תעביר למסך OTP. המשתמש יישמר רק אחרי קוד תקין.</p>
         </form>
       `;
 
@@ -2031,11 +2356,12 @@
 
     function renderOtp() {
       const phone = pendingOtpUser?.phone || "";
+      const isRegistrationOtp = pendingOtpMode === "register";
       app.innerHTML = `
         <main class="login-layout">
           <section class="hero login-photo">
             <div class="hero-content">
-              <h1>אימות נוסף לפני כניסה</h1>
+              <h1>${isRegistrationOtp ? "אימות לפני השלמת הרשמה" : "אימות נוסף לפני כניסה"}</h1>
               <p>בדמו הזה אנחנו מציגים שלב OTP כדי להראות חשיבה אבטחתית בלי להתחבר לשירות SMS אמיתי.</p>
             </div>
           </section>
@@ -2053,7 +2379,7 @@
                 <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required aria-required="true" />
                 <p class="hint">לצורכי הדגמה בלבד, קוד ה-OTP הקבוע הוא 123456.</p>
               </div>
-              <button class="primary-btn" style="width:100%" type="submit">אימות וכניסה</button>
+              <button class="primary-btn" style="width:100%" type="submit">${isRegistrationOtp ? "אימות והרשמה" : "אימות וכניסה"}</button>
               <button class="ghost-btn mt" style="width:100%" type="button" onclick="backToCustomerLogin()">חזרה</button>
             </form>
             <div id="otpMessage"></div>
@@ -2128,10 +2454,13 @@
       const slotButtons = blockedDate ? `
         <div class="message" style="grid-column:1/-1">המספרה סגורה בתאריך זה</div>
       ` : slots.map(time => {
-        const locked = isSlotTaken(selectedDate, time);
+        const taken = isSlotTaken(selectedDate, time);
+        const blockedTime = isTimeBlocked(selectedDate, time);
+        const locked = taken || blockedTime;
+        const label = blockedTime ? "חסום" : "תפוס";
         return `
           <button class="slot ${time === selectedTime ? "active" : ""} ${locked ? "locked" : ""}" ${locked ? "disabled" : ""} onclick="selectTime('${time}')">
-            ${time}${locked ? " · תפוס" : ""}
+            ${time}${locked ? ` · ${label}` : ""}
           </button>
         `;
       }).join("");
@@ -2352,6 +2681,7 @@
     }
 
     function renderOwner() {
+      if (ownerFilter === "all") ownerFilter = "pending";
       const appointments = loadAppointments();
       const today = getDateOffset(0);
       const stats = {
@@ -2400,7 +2730,6 @@
           ${ownerTab("cancelled", "בוטלו")}
           ${ownerTab("customers", "לקוחות")}
           ${ownerTab("blocked-dates", "חסימת תאריכים")}
-          ${ownerTab("all", "הכל")}
         </div>
         ${mainContent}
       `;
@@ -2414,8 +2743,7 @@
       ownerFilter = filter;
       if (filter !== "customers") ownerSelectedCustomerId = "";
       if (filter !== "blocked-dates") {
-        blockedStartDateError = "";
-        blockedEndDateError = "";
+        clearBlockedErrors();
       }
       render();
     }
@@ -2490,8 +2818,23 @@
     window.setOwnerBlockedStartDate = setOwnerBlockedStartDate;
     window.setOwnerBlockedEndDate = setOwnerBlockedEndDate;
     window.blockDateRange = blockDateRange;
+    window.blockHoursRange = blockHoursRange;
     window.unblockBlockedRange = unblockBlockedRange;
     window.unblockDate = unblockDate;
+    window.setOwnerBlockMode = setOwnerBlockMode;
+    window.setOwnerBlockedHourDate = setOwnerBlockedHourDate;
+    window.setOwnerBlockedStartTime = setOwnerBlockedStartTime;
+    window.setOwnerBlockedEndTime = setOwnerBlockedEndTime;
+    window.confirmPendingBlock = confirmPendingBlock;
+    window.cancelPendingBlock = cancelPendingBlock;
+
+    window.addEventListener("storage", event => {
+      if (![storageKeys.appointments, storageKeys.blockedDates, storageKeys.users].includes(event.key)) return;
+      if (!currentUser) return;
+      // במערכת אמיתית ביטול או שינוי סטטוס היה מגיע גם כהתראה יזומה ללקוח. בדמו מרעננים את התצוגה דרך אירוע storage.
+      if (currentUser.type === "customer" && selectedTime && isSlotUnavailable(selectedDate, selectedTime)) selectedTime = "";
+      render();
+    });
 
     seedDemoData();
     restoreSession();
