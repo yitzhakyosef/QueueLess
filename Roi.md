@@ -10,9 +10,20 @@
 ## מבנה טכני
 
 - הקובץ הראשי: `QueueLess_v5.html`.
+- קובץ הכניסה לפרסום: `index.html`.
+- הדומיין הראשי: `https://queue-less-rho.vercel.app/`.
+- GitHub repo: `https://github.com/yitzhakyosef/QueueLess`.
 - אין Backend אמיתי.
 - שכבת הנתונים בדמו היא `localStorage`.
 - הלוגיקה העסקית נמצאת בפונקציות JavaScript בתוך הקובץ.
+
+## מה לקרוא ב-PRD
+
+- `Data Model` ← להבין את מבנה users, appointments, services, blocked_dates ו-session.
+- `כללי Business Logic` ← נעילת slots, חסימת טווחים והרשאות דמו.
+- `מסכים` ← להבין איזה state כל מסך צריך להציג.
+- `Acceptance Criteria` ← לדעת מה הקוד חייב לעבור.
+- `מחוץ ל-Scope` ← כדי לא להוסיף Supabase, SMS, תשלומים או multi-business.
 
 ## מפתחות localStorage
 

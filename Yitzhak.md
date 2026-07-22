@@ -6,6 +6,16 @@
 - להסביר את ה-Scope: עסק אחד בלבד, מספרת רמת גן, בלי מלאי ובלי סיבוך של מסחר אלקטרוני.
 - להכיר את ה-PRD, את ה-Data Model ואת ההחלטות המרכזיות.
 - לוודא שכל שינוי נשאר מתאים ל-MVP של קורס ולא הופך את המערכת למפלצת.
+- לדעת להציג את הדומיין: `https://queue-less-rho.vercel.app/`.
+
+## מה לקרוא ב-PRD
+
+- `פרטי מוצר` ← שם המוצר, גרסה, דומיין וקישור GitHub.
+- `הבעיה` ו-`הפתרון` ← הסיפור העסקי של QueueLess.
+- `גבולות Scope` ← מה נכנס ל-MVP ומה נשאר Future.
+- `User Stories` ← למה כל מסך קיים.
+- `Data Model` ← users, appointments, services, blocked_dates ו-session.
+- `כללי Business Logic` ו-`Acceptance Criteria` ← איך מסבירים שהמערכת עומדת בדרישות.
 
 ## מה חשוב שתדע על v6
 

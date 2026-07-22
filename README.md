@@ -6,7 +6,10 @@
 
 ## אתר חי
 
-TODO: להוסיף קישור Vercel לאחר פרסום.
+- דומיין ראשי: `https://queue-less-rho.vercel.app/`
+- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
+
+הדומיין פורסם דרך Vercel ומחובר לפרויקט GitHub.
 
 ## קובץ המערכת
 
@@ -15,6 +18,13 @@ TODO: להוסיף קישור Vercel לאחר פרסום.
 השם נשאר `v5` כדי לא לשבור את סדר העבודה הקיים, אבל התוכן בפועל עודכן ללוגיקת v6: הרשמה, התחברות, OTP וניהול לקוחות.
 
 לפרסום ב-Vercel נוסף גם `index.html`, שמפנה אוטומטית אל `QueueLess_v5.html`, כדי שכתובת הדומיין הראשית תפתח את המערכת.
+
+## פרסום ו-GitHub
+
+- GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
+- Vercel domain: `https://queue-less-rho.vercel.app/`
+- Entry point לפרסום: `index.html`
+- קובץ המערכת בפועל: `QueueLess_v5.html`
 
 ## איך מריצים מקומית
 

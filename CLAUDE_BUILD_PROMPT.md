@@ -14,6 +14,12 @@
 
 QueueLess היא מערכת לקביעת תורים במספרת רמת גן, כדי למנוע בלאגן בתורים, כפילויות, ביטולים לא מתועדים ושיחות טלפון מיותרות.
 
+הגרסה הנוכחית מפורסמת כאן:
+
+- דומיין ראשי: `https://queue-less-rho.vercel.app/`
+- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
+- GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
+
 ## Tech Constraints
 
 - קובץ HTML אחד.
@@ -38,6 +44,8 @@ QueueLess היא מערכת לקביעת תורים במספרת רמת גן, כ
 `QueueLess_v5.html`
 
 השם נשאר כך מטעמי המשכיות, אבל התוכן צריך לשקף את v6.
+
+שמור גם על `index.html` כקובץ כניסה לפרסום ב-Vercel שמפנה אל `QueueLess_v5.html`.
 
 ## Demo Business
 
@@ -258,6 +266,7 @@ QueueLess היא מערכת לקביעת תורים במספרת רמת גן, כ
 - תאריך חסום לא מאפשר קביעת תור.
 - בעל העסק רואה לקוחות ומחפש לפי שם או נייד.
 - נתונים שורדים רענון.
+- פתיחת `index.html` מובילה למערכת.
 
 ## Do Not Add
 

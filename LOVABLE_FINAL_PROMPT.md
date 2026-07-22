@@ -10,6 +10,12 @@ The product solves appointment chaos caused by WhatsApp, phone calls and manual 
 
 Keep the app simple. Do not add features beyond this prompt.
 
+Current live deployment:
+
+- Main domain: `https://queue-less-rho.vercel.app/`
+- Direct app URL: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
+- GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
+
 ## Language and UX
 
 - UI language: Hebrew only.
@@ -27,6 +33,7 @@ Keep the app simple. Do not add features beyond this prompt.
 - No payments.
 - No multi-business.
 - No inventory.
+- Keep `index.html` as the Vercel entrypoint that opens `QueueLess_v5.html`.
 
 ## User Types
 
@@ -256,3 +263,4 @@ Customer side:
 - Blocked date blocks booking.
 - Owner customer list works.
 - Data survives refresh.
+- Opening `index.html` opens the app.
