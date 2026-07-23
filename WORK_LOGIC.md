@@ -223,8 +223,9 @@
 
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
 - דומיין ראשי: `https://queue-less-rho.vercel.app/`
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
-- `index.html` משמש כ-entrypoint שמפנה אל `QueueLess_v5.html`.
+- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`
+- קובץ המערכת הראשי הוא `QueueLess.html`.
+- `index.html` הוסר כדי להשאיר בתיקייה רק את קובץ המערכת בפועל ולמנוע בלבול בהצגה.
 
 למה:
 

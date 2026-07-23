@@ -3,14 +3,14 @@
 ## אחריות שלך
 
 - להסביר איך המערכת בנויה בפועל.
-- להבין את הקובץ `QueueLess_v5.html`, למרות שהוא כבר מכיל את עדכוני v6.
+- להבין את הקובץ `QueueLess.html`, שמכיל את עדכוני v6.
 - לשמור על Vanilla JS, RTL, עברית ו-`localStorage`.
 - לא להוסיף פיצ'רים מעבר למה שאושר.
 
 ## מבנה טכני
 
-- הקובץ הראשי: `QueueLess_v5.html`.
-- קובץ הכניסה לפרסום: `index.html`.
+- הקובץ הראשי: `QueueLess.html`.
+- אין `index.html` בפרויקט הנוכחי כדי למנוע בלבול בין קובץ כניסה לקובץ מערכת.
 - הדומיין הראשי: `https://queue-less-rho.vercel.app/`.
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`.
 - אין Backend אמיתי.

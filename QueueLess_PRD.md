@@ -6,9 +6,9 @@
 - עסק הדמו: מספרת רמת גן.
 - סוג מוצר: מערכת קביעת וניהול תורים לעסק שירות קטן, בפועל מספרה.
 - גרסה נוכחית: v6.
-- קובץ מערכת: `QueueLess_v5.html`, מעודכן לדרישות v6.
+- קובץ מערכת: `QueueLess.html`, מעודכן לדרישות v6.
 - דומיין ראשי: `https://queue-less-rho.vercel.app/`.
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess_v5.html`.
+- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`.
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`.
 
 ## משפט מוצר
@@ -65,7 +65,7 @@ QueueLess מאפשרת ללקוח להירשם, להתחבר, לקבוע תור 
 - שמירה ב-`localStorage`.
 - RTL ועברית.
 - התאמה רספונסיבית בסיסית.
-- פרסום ב-Vercel דרך `index.html`.
+- פרסום ב-Vercel דרך הקובץ `QueueLess.html`.
 
 ### Nice To Have
 

@@ -13,7 +13,7 @@ Keep the app simple. Do not add features beyond this prompt.
 Current live deployment:
 
 - Main domain: `https://queue-less-rho.vercel.app/`
-- Direct app URL: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
+- Direct app URL: `https://queue-less-rho.vercel.app/QueueLess.html`
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
 
 ## Language and UX
@@ -33,7 +33,7 @@ Current live deployment:
 - No payments.
 - No multi-business.
 - No inventory.
-- Keep `index.html` as the Vercel entrypoint that opens `QueueLess_v5.html`.
+- Do not create `index.html` in the current project structure. The main app file is `QueueLess.html`.
 
 ## User Types
 
@@ -326,4 +326,4 @@ Conflicting appointments:
 - Owner dashboard has no “all” tab.
 - Owner customer list works.
 - Data survives refresh.
-- Opening `index.html` opens the app.
+- Opening `QueueLess.html` opens the app.

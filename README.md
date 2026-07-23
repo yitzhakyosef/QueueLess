@@ -7,30 +7,29 @@
 ## אתר חי
 
 - דומיין ראשי: `https://queue-less-rho.vercel.app/`
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess_v5.html`
+- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`
 
 הדומיין פורסם דרך Vercel ומחובר לפרויקט GitHub.
 
 ## קובץ המערכת
 
-קובץ המערכת הראשי הוא `QueueLess_v5.html`.
+קובץ המערכת הראשי הוא `QueueLess.html`.
 
-השם נשאר `v5` כדי לא לשבור את סדר העבודה הקיים, אבל התוכן בפועל עודכן ללוגיקת v6: הרשמה, התחברות, OTP וניהול לקוחות.
+שם הקובץ עודכן לשם נקי יותר, אבל התוכן בפועל עדיין משקף את לוגיקת v6: הרשמה, התחברות, OTP וניהול לקוחות.
 
-לפרסום ב-Vercel נוסף גם `index.html`, שמפנה אוטומטית אל `QueueLess_v5.html`, כדי שכתובת הדומיין הראשית תפתח את המערכת.
+קובץ `index.html` הוסר מהפרויקט. להצגה מומלץ לפתוח את הקישור הישיר למערכת.
 
 ## פרסום ו-GitHub
 
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
 - Vercel domain: `https://queue-less-rho.vercel.app/`
-- Entry point לפרסום: `index.html`
-- קובץ המערכת בפועל: `QueueLess_v5.html`
+- קובץ המערכת בפועל: `QueueLess.html`
 
 ## איך מריצים מקומית
 
 1. פותחים את התיקייה:
    `C:\Users\Isaac\Desktop\לימודים\מסחר ועסקים דיגיטליים יישומיים`
-2. לוחצים פעמיים על `index.html` או על `QueueLess_v5.html`.
+2. לוחצים פעמיים על `QueueLess.html`.
 3. משתמשים בכפתור “איפוס נתוני מערכת” אם רוצים להתחיל דמו נקי.
 
 ## פרטי כניסה לדמו
@@ -81,10 +80,10 @@
 1. `README.md` ← להבין מה קיים ואיך מריצים.
 2. `WORK_LOGIC.md` ← להבין את ההחלטות ולמה לא סיבכנו.
 3. `QueueLess_PRD.md` ← להבין דרישות מוצר, מסכים ו-Acceptance Criteria.
-4. `index.html` ו-`QueueLess_v5.html` ← לראות את המערכת בפועל.
+4. `QueueLess.html` ← לראות את המערכת בפועל.
 5. `TESTING.md` ← להבין אילו בדיקות עברו ומה עומרי צריך לדעת.
 6. `Yitzhak.md`, `Avital.md`, `Roi.md`, `Omri.md` ← הכנה לפי תפקיד.
-7. `QueueLess_Final_Presentation.pptx` ← מצגת סופית להצגה בכיתה.
+7. `QueueLess_Presentation.pptx` ← מצגת סופית להצגה בכיתה.
 8. `LOCAL_STORAGE_DEMO.md` ← מה להראות כשמציגים את ה-DB בדמו.
 9. `CLAUDE_BUILD_PROMPT.md`, `LOVABLE_FINAL_PROMPT.md` ← פרומפטים לבנייה או שחזור.
 
@@ -95,9 +94,8 @@
 | `README.md` | דף כניסה לפרויקט, סדר קריאה ותסריט דמו |
 | `QueueLess_PRD.md` | מסמך הדרישות הרשמי של המוצר |
 | `WORK_LOGIC.md` | הסבר החלטות, Scope ולוגיקת עבודה |
-| `index.html` | קובץ כניסה לפרסום ב-Vercel שמפנה למערכת |
-| `QueueLess_v5.html` | קובץ המערכת בפועל, מעודכן ל-v6 |
-| `QueueLess_Final_Presentation.pptx` | מצגת סופית להצגת הפרויקט בכיתה |
+| `QueueLess.html` | קובץ המערכת בפועל, מעודכן ל-v6 |
+| `QueueLess_Presentation.pptx` | מצגת סופית להצגת הפרויקט בכיתה |
 | `LOCAL_STORAGE_DEMO.md` | מדריך להצגת נתוני `localStorage` כ-DB בדמו |
 | `TESTING.md` | בדיקות קבלה ותוצאות בדיקה |
 | `Yitzhak.md` | סיכום תפקיד יצחק והכנה לשאלות |
@@ -146,7 +144,7 @@
 
 ## תסריט דמו מומלץ לכיתה
 
-1. פותחים את `index.html` או את האתר החי ומסבירים שהמערכת פותרת בלאגן בתורים במספרה.
+1. פותחים את `QueueLess.html` או את הקישור הישיר באתר החי ומסבירים שהמערכת פותרת בלאגן בתורים במספרה.
 2. נרשמים כלקוח ראשון, למשל “ישראל ישראלי”, נייד `0501111111`, ת.ז `123456789`, סיסמה `2468`.
 3. מזינים OTP שגוי ומראים שההרשמה לא הושלמה, ואז מזינים `123456`.
 4. קובעים תור לשעה `09:00` ומראים שהוא נכנס כ-`pending`.
