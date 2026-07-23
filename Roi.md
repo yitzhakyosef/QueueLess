@@ -11,7 +11,7 @@
 
 - הקובץ הראשי: `QueueLess.html`.
 - אין `index.html` בפרויקט הנוכחי כדי למנוע בלבול בין קובץ כניסה לקובץ מערכת.
-- הדומיין הראשי: `https://queue-less-rho.vercel.app/`.
+- הקישור להצגה: `https://queue-less-rho.vercel.app/QueueLess.html`.
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`.
 - אין Backend אמיתי.
 - שכבת הנתונים בדמו היא `localStorage`.

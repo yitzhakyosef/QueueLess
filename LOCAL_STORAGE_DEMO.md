@@ -7,7 +7,7 @@
 ## איך פותחים
 
 1. פותחים את האתר:
-   `https://queue-less-rho.vercel.app/`
+   `https://queue-less-rho.vercel.app/QueueLess.html`
 2. לוחצים `F12`.
 3. עוברים לטאב `Application`.
 4. בצד שמאל פותחים:

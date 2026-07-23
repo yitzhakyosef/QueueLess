@@ -12,8 +12,8 @@ Keep the app simple. Do not add features beyond this prompt.
 
 Current live deployment:
 
-- Main domain: `https://queue-less-rho.vercel.app/`
-- Direct app URL: `https://queue-less-rho.vercel.app/QueueLess.html`
+- Project domain: `https://queue-less-rho.vercel.app/`
+- Presentation URL: `https://queue-less-rho.vercel.app/QueueLess.html`
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
 
 ## Language and UX

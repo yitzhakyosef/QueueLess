@@ -222,8 +222,8 @@
 המערכת נשמרת ב-GitHub ומפורסמת ב-Vercel.
 
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
-- דומיין ראשי: `https://queue-less-rho.vercel.app/`
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`
+- דומיין הפרויקט: `https://queue-less-rho.vercel.app/`
+- קישור להצגה: `https://queue-less-rho.vercel.app/QueueLess.html`
 - קובץ המערכת הראשי הוא `QueueLess.html`.
 - `index.html` הוסר כדי להשאיר בתיקייה רק את קובץ המערכת בפועל ולמנוע בלבול בהצגה.
 

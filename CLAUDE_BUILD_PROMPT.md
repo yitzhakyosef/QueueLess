@@ -16,8 +16,8 @@ QueueLess היא מערכת לקביעת תורים במספרת רמת גן, כ
 
 הגרסה הנוכחית מפורסמת כאן:
 
-- דומיין ראשי: `https://queue-less-rho.vercel.app/`
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`
+- דומיין הפרויקט: `https://queue-less-rho.vercel.app/`
+- קישור להצגה: `https://queue-less-rho.vercel.app/QueueLess.html`
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
 
 ## Tech Constraints

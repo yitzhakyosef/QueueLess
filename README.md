@@ -6,10 +6,10 @@
 
 ## אתר חי
 
-- דומיין ראשי: `https://queue-less-rho.vercel.app/`
-- קישור ישיר למערכת: `https://queue-less-rho.vercel.app/QueueLess.html`
+- דומיין הפרויקט: `https://queue-less-rho.vercel.app/`
+- קישור להצגה: `https://queue-less-rho.vercel.app/QueueLess.html`
 
-הדומיין פורסם דרך Vercel ומחובר לפרויקט GitHub.
+הדומיין פורסם דרך Vercel ומחובר לפרויקט GitHub. מכיוון שהסרנו את `index.html`, פותחים בהצגה את הקישור הישיר למערכת.
 
 ## קובץ המערכת
 
@@ -22,7 +22,7 @@
 ## פרסום ו-GitHub
 
 - GitHub repo: `https://github.com/yitzhakyosef/QueueLess`
-- Vercel domain: `https://queue-less-rho.vercel.app/`
+- Vercel display URL: `https://queue-less-rho.vercel.app/QueueLess.html`
 - קובץ המערכת בפועל: `QueueLess.html`
 
 ## איך מריצים מקומית
