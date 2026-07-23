@@ -84,7 +84,9 @@
 4. `index.html` ו-`QueueLess_v5.html` ← לראות את המערכת בפועל.
 5. `TESTING.md` ← להבין אילו בדיקות עברו ומה עומרי צריך לדעת.
 6. `Yitzhak.md`, `Avital.md`, `Roi.md`, `Omri.md` ← הכנה לפי תפקיד.
-7. `CLAUDE_BUILD_PROMPT.md`, `LOVABLE_FINAL_PROMPT.md` ← פרומפטים לבנייה או שחזור.
+7. `QueueLess_Final_Presentation.pptx` ← מצגת סופית להצגה בכיתה.
+8. `LOCAL_STORAGE_DEMO.md` ← מה להראות כשמציגים את ה-DB בדמו.
+9. `CLAUDE_BUILD_PROMPT.md`, `LOVABLE_FINAL_PROMPT.md` ← פרומפטים לבנייה או שחזור.
 
 ## מבנה קבצים
 
@@ -95,6 +97,8 @@
 | `WORK_LOGIC.md` | הסבר החלטות, Scope ולוגיקת עבודה |
 | `index.html` | קובץ כניסה לפרסום ב-Vercel שמפנה למערכת |
 | `QueueLess_v5.html` | קובץ המערכת בפועל, מעודכן ל-v6 |
+| `QueueLess_Final_Presentation.pptx` | מצגת סופית להצגת הפרויקט בכיתה |
+| `LOCAL_STORAGE_DEMO.md` | מדריך להצגת נתוני `localStorage` כ-DB בדמו |
 | `TESTING.md` | בדיקות קבלה ותוצאות בדיקה |
 | `Yitzhak.md` | סיכום תפקיד יצחק והכנה לשאלות |
 | `Avital.md` | סיכום תפקיד אביטל והכנה לשאלות UX |
