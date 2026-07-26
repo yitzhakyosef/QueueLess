@@ -189,10 +189,10 @@
 ### מה נוסף
 
 - נוצרו קבצי הכנה לפי תפקיד:
-  - `Yitzhak.md`
-  - `Avital.md`
-  - `Roi.md`
-  - `Omri.md`
+  - `Roles/Yitzhak.md`
+  - `Roles/Avital.md`
+  - `Roles/Roi.md`
+  - `Roles/Omri.md`
 - בכל קובץ תפקיד נכתבו הדברים שכל חבר צוות צריך לדעת, כולל שאלות אפשריות מהמרצה.
 - `README.md` הורחב כך שיכלול גם סדר קריאה מומלץ, במקום להחזיק קובץ `READ_ORDER.md` נפרד.
 
@@ -387,10 +387,10 @@
 - `QueueLess_Presentation.pptx`
 - `CLAUDE_BUILD_PROMPT.md`
 - `LOVABLE_FINAL_PROMPT.md`
-- `Yitzhak.md`
-- `Avital.md`
-- `Roi.md`
-- `Omri.md`
+- `Roles/Yitzhak.md`
+- `Roles/Avital.md`
+- `Roles/Roi.md`
+- `Roles/Omri.md`
 
 ### מה עדיין דורש תשומת לב לפני ההצגה
 

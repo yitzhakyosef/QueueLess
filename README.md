@@ -82,7 +82,7 @@
 3. `QueueLess_PRD.md` ← להבין דרישות מוצר, מסכים ו-Acceptance Criteria.
 4. `QueueLess.html` ← לראות את המערכת בפועל.
 5. `TESTING.md` ← להבין אילו בדיקות עברו ומה עומרי צריך לדעת.
-6. `Yitzhak.md`, `Avital.md`, `Roi.md`, `Omri.md` ← הכנה לפי תפקיד.
+6. `Roles/Yitzhak.md`, `Roles/Avital.md`, `Roles/Roi.md`, `Roles/Omri.md` ← הכנה לפי תפקיד.
 7. `QueueLess_Presentation.pptx` ← מצגת סופית להצגה בכיתה.
 8. `LOCAL_STORAGE_DEMO.md` ← מה להראות כשמציגים את ה-DB בדמו.
 9. `CLAUDE_BUILD_PROMPT.md`, `LOVABLE_FINAL_PROMPT.md` ← פרומפטים לבנייה או שחזור.
@@ -98,10 +98,10 @@
 | `QueueLess_Presentation.pptx` | מצגת סופית להצגת הפרויקט בכיתה |
 | `LOCAL_STORAGE_DEMO.md` | מדריך להצגת נתוני `localStorage` כ-DB בדמו |
 | `TESTING.md` | בדיקות קבלה ותוצאות בדיקה |
-| `Yitzhak.md` | סיכום תפקיד יצחק והכנה לשאלות |
-| `Avital.md` | סיכום תפקיד אביטל והכנה לשאלות UX |
-| `Roi.md` | סיכום תפקיד רועי והכנה לשאלות בנייה |
-| `Omri.md` | סיכום תפקיד עומרי והכנה לשאלות QA |
+| `Roles/Yitzhak.md` | סיכום תפקיד יצחק והכנה לשאלות |
+| `Roles/Avital.md` | סיכום תפקיד אביטל והכנה לשאלות UX |
+| `Roles/Roi.md` | סיכום תפקיד רועי והכנה לשאלות בנייה |
+| `Roles/Omri.md` | סיכום תפקיד עומרי והכנה לשאלות QA |
 | `CLAUDE_BUILD_PROMPT.md` | פרומפט לבנייה או עדכון דרך Claude |
 | `LOVABLE_FINAL_PROMPT.md` | פרומפט לבנייה או שחזור דרך Lovable |
 

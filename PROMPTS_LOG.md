@@ -467,10 +467,10 @@ Codex הכין מבנה של שיח בסגנון:
 
 - `README.md` קיבל סדר קריאה מומלץ.
 - נוצרו:
-  - `Yitzhak.md`
-  - `Avital.md`
-  - `Roi.md`
-  - `Omri.md`
+  - `Roles/Yitzhak.md`
+  - `Roles/Avital.md`
+  - `Roles/Roi.md`
+  - `Roles/Omri.md`
 - בכל קובץ הוגדר מה חבר הצוות צריך לדעת ומה המרצה עשויה לשאול.
 
 ### תיקונים או המשך
