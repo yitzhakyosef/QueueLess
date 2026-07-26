@@ -456,3 +456,34 @@ QueueLess מאפשרת ללקוח להירשם, להתחבר, לקבוע תור 
 - אין כמה עסקים.
 - אין הרשאות צד שרת.
 - אין Reset Password.
+
+
+## עדכון PRD: מסך מבט נתונים
+
+### מטרה
+
+להוסיף בדשבורד בעל העסק מסך שמציג את הנתונים השמורים ב-`localStorage` במבנה טבלאי ברור, כדי להדגים בכיתה שהמערכת נשענת על מודל נתונים מסודר גם בלי DB חיצוני.
+
+### מסך חדש
+
+- שם הטאב: `מבט נתונים`.
+- נגיש רק לבעל העסק אחרי כניסה עם `RG2026`.
+- אינו מוצג ללקוחות.
+- מתנהג כמו שאר הטאבים בדשבורד: בחירה בו מציגה רק את התוכן שלו, ובחירת טאב אחר מסתירה אותו.
+
+### טבלאות מוצגות
+
+- `users` ← מתוך `queueless-users`: `id`, `full_name`, `phone`, `national_id`, `email`, `created_at`.
+- `appointments` ← מתוך `queueless_ux_appointments`: `id`, `customer_id`, `customer_name`, `service_id`, `service_name`, `date`, `time`, `status`, `updated_at`.
+- `blocked_time_ranges` ← מתוך `queueless-blocked-dates`: `id`, `type`, `start_date`, `end_date`, `start_time`, `end_time`, משמעות עסקית, `created_at`.
+- `services` ← מערך JavaScript סטטי בקוד: `id`, `name`, `duration`, `price`, `description`.
+- `active_session` ← מתוך `queueless_ux_session`: `type`, `userId`, שם תצוגה, הערה.
+
+### Acceptance Criteria
+
+- הטאב מופיע רק בדשבורד בעל העסק.
+- כל טבלה קוראת את הנתונים בפועל מהמפתח המקורי שלה ב-`localStorage` או ממערך `services`.
+- אין שמירת עותק נפרד של הנתונים.
+- שינוי בתורים, לקוחות, חסימות או session מתעדכן ברינדור מחדש.
+- שדה סיסמה אינו מוצג בטבלת `users`.
+- אם אין רשומות, מוצג מצב ריק: `אין רשומות להצגה`.

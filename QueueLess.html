@@ -800,6 +800,16 @@
       background: var(--red-soft);
     }
 
+    .status-badge.hours {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .status-badge.full-day {
+      color: var(--copper);
+      background: var(--cream-strong);
+    }
+
     .appointment-card {
       display: grid;
       gap: 12px;
@@ -924,6 +934,141 @@
       background: #fff8e8;
     }
 
+    .data-view-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .data-table-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 18px 46px rgba(17, 24, 39, 0.08);
+    }
+
+    .data-table-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,248,232,0.95), rgba(243,229,207,0.78));
+    }
+
+    .data-table-head h3 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .data-table-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .db-key {
+      direction: ltr;
+      unicode-bidi: embed;
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--copper);
+      background: rgba(201,154,63,0.14);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .data-table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+      direction: rtl;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(17,24,39,0.08);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .data-table th {
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.66);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .data-code {
+      direction: ltr;
+      unicode-bidi: embed;
+      text-align: left;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+    }
+
+    .data-empty {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .data-note-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .data-note-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.78);
+    }
+
+    .data-note-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .data-note-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .data-security-note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(37,99,235,0.18);
+      border-radius: 18px;
+      color: var(--ink-soft);
+      background: var(--blue-soft);
+      line-height: 1.6;
+      font-weight: 800;
+    }
+
     .success-card {
       overflow: hidden;
       display: grid;
@@ -1014,6 +1159,7 @@
 
       .grid.three,
       .grid.four,
+      .data-note-grid,
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -1057,11 +1203,20 @@
       .customer-grid,
       .grid.three,
       .grid.four,
+      .data-note-grid,
       .stats-grid,
       .appointment-meta,
       .stepper,
       .slot-grid {
         grid-template-columns: 1fr;
+      }
+
+      .data-table-head {
+        flex-direction: column;
+      }
+
+      .db-key {
+        white-space: normal;
       }
 
       .reminder-card {
@@ -2669,6 +2824,217 @@
       `;
     }
 
+    function loadSessionForDataView() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKeys.session) || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function dataValue(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      return value;
+    }
+
+    function dataCell(value, className = "") {
+      return `<td class="${className}">${escapeHtml(dataValue(value))}</td>`;
+    }
+
+    function dataHtmlCell(html, className = "") {
+      return `<td class="${className}">${html}</td>`;
+    }
+
+    function dataStatusBadge(status) {
+      const allowedStatuses = ["pending", "confirmed", "cancelled"];
+      if (!allowedStatuses.includes(status)) return escapeHtml(dataValue(status));
+      return `<span class="status-badge ${status}">${statusLabel(status)}</span>`;
+    }
+
+    function dataTypeBadge(type) {
+      const safeType = type === "hours" ? "hours" : "full-day";
+      return `<span class="status-badge ${safeType}">${safeType}</span>`;
+    }
+
+    function renderDataTable({ title, subtitle, keyLabel, headers, rows }) {
+      const tableRows = rows.length ? `
+        <div class="data-table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+            </thead>
+            <tbody>${rows.map(row => `<tr>${row.join("")}</tr>`).join("")}</tbody>
+          </table>
+        </div>
+      ` : `<div class="data-empty">אין רשומות להצגה</div>`;
+
+      return `
+        <article class="data-table-card">
+          <div class="data-table-head">
+            <div>
+              <h3>${escapeHtml(title)}</h3>
+              <p>${escapeHtml(subtitle)}</p>
+            </div>
+            <span class="db-key">${escapeHtml(keyLabel)}</span>
+          </div>
+          ${tableRows}
+        </article>
+      `;
+    }
+
+    function renderUsersDataTable() {
+      const rows = loadUsers().map(user => [
+        dataCell(user.id, "data-code"),
+        dataCell(customerDisplayName(user)),
+        dataCell(user.phone || user.id, "data-code"),
+        dataCell(user.national_id, "data-code"),
+        dataCell(user.email, "data-code"),
+        dataCell(user.created_at, "data-code")
+      ]);
+
+      return renderDataTable({
+        title: "users",
+        subtitle: "לקוחות רשומים. הסיסמה אינה מוצגת מטעמי אבטחה, גם אם היא קיימת ב-localStorage.",
+        keyLabel: "localStorage key: queueless-users",
+        headers: ["id", "full_name", "phone", "national_id", "email", "created_at"],
+        rows
+      });
+    }
+
+    function renderAppointmentsDataTable() {
+      const rows = sortAppointments(loadAppointments()).map(appointment => [
+        dataCell(appointment.id, "data-code"),
+        dataCell(appointment.customer_id, "data-code"),
+        dataCell(appointment.customer_name),
+        dataCell(appointment.service_id, "data-code"),
+        dataCell(appointment.service_name),
+        dataCell(appointment.appointment_date, "data-code"),
+        dataCell(appointment.appointment_time, "data-code"),
+        dataHtmlCell(dataStatusBadge(appointment.status)),
+        dataCell(appointment.updated_at, "data-code")
+      ]);
+
+      return renderDataTable({
+        title: "appointments",
+        subtitle: "כל בקשת תור נשמרת כאן. סטטוס pending או confirmed נועל את השעה ללקוחות אחרים.",
+        keyLabel: "localStorage key: queueless_ux_appointments",
+        headers: ["id", "customer_id", "customer_name", "service_id", "service_name", "date", "time", "status", "updated_at"],
+        rows
+      });
+    }
+
+    function blockedBusinessMeaning(range) {
+      if (range.type === "hours") return "חסימת שעות בתוך יום. רק ה-slots בטווח מוסתרים ללקוחות.";
+      if (range.start_date === range.end_date) return "יום מלא חסום לקביעת תורים.";
+      return "טווח ימים מלאים חסום, למשל חופשה רציפה של בעל העסק.";
+    }
+
+    function renderBlockedRangesDataTable() {
+      const rows = loadBlockedDates().map(range => {
+        const isHours = range.type === "hours";
+        return [
+          dataCell(range.id, "data-code"),
+          dataHtmlCell(dataTypeBadge(range.type)),
+          dataCell(isHours ? range.date : range.start_date, "data-code"),
+          dataCell(isHours ? range.date : range.end_date, "data-code"),
+          dataCell(isHours ? range.start_time : "-", "data-code"),
+          dataCell(isHours ? range.end_time : "-", "data-code"),
+          dataCell(blockedBusinessMeaning(range)),
+          dataCell(range.created_at, "data-code")
+        ];
+      });
+
+      return renderDataTable({
+        title: "blocked_time_ranges",
+        subtitle: "חסימות יום מלא וטווח שעות נקראות מאותו מפתח ומשפיעות על זמינות התורים.",
+        keyLabel: "localStorage key: queueless-blocked-dates",
+        headers: ["id", "type", "start_date", "end_date", "start_time", "end_time", "משמעות עסקית", "created_at"],
+        rows
+      });
+    }
+
+    function renderServicesDataTable() {
+      const rows = services.map(service => [
+        dataCell(service.id, "data-code"),
+        dataCell(service.name),
+        dataCell(`${service.duration} דקות`),
+        dataCell(`${service.price} ₪`),
+        dataCell(service.description)
+      ]);
+
+      return renderDataTable({
+        title: "services",
+        subtitle: "מערך שירותים סטטי שמוגדר בקוד JavaScript, ולא נשמר ב-localStorage.",
+        keyLabel: "static JS array: services",
+        headers: ["id", "name", "duration", "price", "description"],
+        rows
+      });
+    }
+
+    function renderActiveSessionDataTable() {
+      const session = loadSessionForDataView();
+      const users = loadUsers();
+      const rows = session ? [(() => {
+        const userId = session.customerId || "-";
+        const sessionUser = session.type === "customer" ? users.find(user => user.id === session.customerId) : null;
+        const displayName = session.type === "owner" ? "בעל המספרה" : customerDisplayName(sessionUser);
+        const note = session.type === "owner" ? "סשן בעל עסק פעיל לאחר כניסה עם RG2026." : "סשן לקוח פעיל בדפדפן הנוכחי.";
+        return [
+          dataCell(session.type, "data-code"),
+          dataCell(userId, "data-code"),
+          dataCell(displayName),
+          dataCell(note)
+        ];
+      })()] : [];
+
+      return renderDataTable({
+        title: "active_session",
+        subtitle: "סשן זמני שמאפשר למערכת לדעת מי מחובר כרגע בדפדפן.",
+        keyLabel: "localStorage key: queueless_ux_session",
+        headers: ["type", "userId", "שם תצוגה", "הערה"],
+        rows
+      });
+    }
+
+    function renderDataViewPanel() {
+      return `
+        <section class="section-head">
+          <div>
+            <h2>מבט נתונים</h2>
+            <p>תצוגת DB דמו מתוך localStorage. המסך קורא ישירות מאותם מפתחות שהמערכת משתמשת בהם, בלי עותק נוסף.</p>
+          </div>
+        </section>
+        <div class="data-security-note">
+          סיסמאות לקוחות אינן מוצגות בטבלאות. תעודת זהות מוצגת לבעל העסק בלבד לצורך דמו ניהולי, ובמערכת Production מידע מזהה כזה היה נשמר ומוגן בצד שרת.
+        </div>
+        <section class="data-view-grid mt">
+          ${renderUsersDataTable()}
+          ${renderAppointmentsDataTable()}
+          ${renderBlockedRangesDataTable()}
+          ${renderServicesDataTable()}
+          ${renderActiveSessionDataTable()}
+        </section>
+        <section class="data-note-grid">
+          <article class="data-note-card">
+            <h3>קשר לקוח ← תור</h3>
+            <p>appointments.customer_id מחובר ל-users.id, ולכן לקוח רואה רק את התורים שלו.</p>
+          </article>
+          <article class="data-note-card">
+            <h3>נעילת שעות</h3>
+            <p>תור בסטטוס pending או confirmed מסתיר את אותו slot מלקוחות אחרים.</p>
+          </article>
+          <article class="data-note-card">
+            <h3>חסימת בעל עסק</h3>
+            <p>חסימת יום או שעות מסתירה זמינות ומבטלת אוטומטית תורים מתנגשים.</p>
+          </article>
+          <article class="data-note-card">
+            <h3>למה לא Production</h3>
+            <p>localStorage מתאים לדמו. מוצר אמיתי דורש DB שרתי, Auth, הרשאות והגנה על מידע מזהה.</p>
+          </article>
+        </section>
+      `;
+    }
+
     function setOwnerCustomerQuery(value) {
       ownerCustomerQuery = value;
       ownerSelectedCustomerId = "";
@@ -2700,7 +3066,7 @@
           </div>
         </div>
       `;
-      const mainContent = ownerFilter === "customers" ? renderCustomersPanel() : ownerFilter === "blocked-dates" ? renderBlockedDatesPanel() : `
+      const mainContent = ownerFilter === "customers" ? renderCustomersPanel() : ownerFilter === "blocked-dates" ? renderBlockedDatesPanel() : ownerFilter === "data-view" ? renderDataViewPanel() : `
         <section class="section-head">
           <div>
             <h2>יומן תורים</h2>
@@ -2730,6 +3096,7 @@
           ${ownerTab("cancelled", "בוטלו")}
           ${ownerTab("customers", "לקוחות")}
           ${ownerTab("blocked-dates", "חסימת תאריכים")}
+          ${ownerTab("data-view", "מבט נתונים")}
         </div>
         ${mainContent}
       `;
@@ -2829,7 +3196,7 @@
     window.cancelPendingBlock = cancelPendingBlock;
 
     window.addEventListener("storage", event => {
-      if (![storageKeys.appointments, storageKeys.blockedDates, storageKeys.users].includes(event.key)) return;
+      if (![storageKeys.appointments, storageKeys.blockedDates, storageKeys.users, storageKeys.session].includes(event.key)) return;
       if (!currentUser) return;
       // במערכת אמיתית ביטול או שינוי סטטוס היה מגיע גם כהתראה יזומה ללקוח. בדמו מרעננים את התצוגה דרך אירוע storage.
       if (currentUser.type === "customer" && selectedTime && isSlotUnavailable(selectedDate, selectedTime)) selectedTime = "";

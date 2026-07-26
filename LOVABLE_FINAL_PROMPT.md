@@ -327,3 +327,24 @@ Conflicting appointments:
 - Owner customer list works.
 - Data survives refresh.
 - Opening `QueueLess.html` opens the app.
+
+
+## Update: Database Demo Tab
+
+Add an owner-only dashboard tab named `מבט נתונים`.
+
+The tab should show the current `localStorage` data as clean RTL tables:
+
+- `users` from `queueless-users`.
+- `appointments` from `queueless_ux_appointments`.
+- `blocked_time_ranges` from `queueless-blocked-dates`.
+- `services` from the static JavaScript array.
+- `active_session` from `queueless_ux_session`.
+
+Important:
+
+- Do not create a second data source.
+- Read directly from the existing `localStorage` keys on render.
+- Do not show customer passwords.
+- Display status badges in Hebrew.
+- Add empty states and four short explanation cards for classroom demo.

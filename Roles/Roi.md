@@ -105,3 +105,16 @@
 ### איך טאב לקוח מתעדכן כשבעל העסק מבטל?
 
 הביטול נשמר ב-`queueless_ux_appointments`. טאב אחר מקבל אירוע `storage` ומרנדר מחדש את “התורים שלי”.
+
+
+## עדכון לתפקיד: מימוש מבט נתונים
+
+רועי צריך לדעת להסביר שהטאב `מבט נתונים` הוא View בלבד.
+
+דגשים טכניים:
+
+- הפונקציות קוראות דרך `loadUsers()`, `loadAppointments()`, `loadBlockedDates()` וקריאה ישירה ל-`queueless_ux_session`.
+- `services` מגיע ממערך JavaScript סטטי.
+- אין שמירת state חדש ואין שכפול נתונים.
+- `storage` listener כולל גם את `storageKeys.session` כדי לרענן תצוגה בין טאבים.
+- שדה `password` לא נכלל בטבלת `users`.

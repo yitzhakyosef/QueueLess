@@ -339,3 +339,23 @@ QueueLess היא מערכת לקביעת תורים במספרת רמת גן, כ
 - כמה עסקים.
 - מלאי.
 - פיצ'רים שלא אושרו.
+
+
+## Update: Owner Data View Tab
+
+Add an owner-only dashboard tab named `מבט נתונים`.
+
+Requirements:
+
+- The tab is visible only after owner login with `RG2026`.
+- It is part of the same tab mechanism as the other owner dashboard tabs.
+- It displays live data from the existing sources, without duplicating data.
+- Tables:
+  - `users` from `queueless-users`: `id`, `full_name`, `phone`, `national_id`, `email`, `created_at`.
+  - `appointments` from `queueless_ux_appointments`: `id`, `customer_id`, `customer_name`, `service_id`, `service_name`, `date`, `time`, `status`, `updated_at`.
+  - `blocked_time_ranges` from `queueless-blocked-dates`: `id`, `type`, `start_date`, `end_date`, `start_time`, `end_time`, business meaning, `created_at`.
+  - `services` from the static JavaScript array, with a note that it is not stored in `localStorage`.
+  - `active_session` from `queueless_ux_session`.
+- Do not show customer passwords. If the field exists in storage, omit it from the table.
+- Show empty state text: `אין רשומות להצגה`.
+- Add four explanatory cards: customer ← appointment relation, slot locking, owner blocking, and why this is not Production.
